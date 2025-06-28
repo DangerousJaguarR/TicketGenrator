@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Train E-ticket genrate</title>
+        <script src=
+"https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+    
+            @page {
+                size: A4;
+                margin: 0;
+            }
+    
+            /* Set content to fill the entire A4 page */
+            html,
+            body {
+                width: 210mm;
+                height: auto;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            #E-ticket_body
+            {
+                width: 210mm;
+                height: auto;
+                display: flex;
+            }
+            #E-ticket_mainBody
+            {
+                width:210mm;
+                height: 297mm;
+            }
+            .e-Image,.e-div,.e-Data
+            {
+                width:210mm;
+                height: 297mm;
+            }
+            .E-ticket
+            {
+                z-index: -4;
+            }
+            .e-Data
+            {
+                width: 200mm;
+                height: 50px;
+                display: flex;
+                position:absolute;
+                z-index: 4;
+                background: transparent;
+                top: 200px;
+                left: 65px;
+                padding-right: 90px;
+            }
+            .e-Data2
+            {
+                width: 200mm;
+                height: 50px;
+                display: flex;
+                position:absolute;
+                z-index: 4;
+                background: transparent;
+                top: 285px;
+                left: 40px;
+                padding-right: 90px;
+            }
+            .e-Data3
+            {
+                width: 200mm;
+                height: 50px;
+                display: inline-block;
+                position:absolute;
+                z-index: 4;
+                background: transparent;
+                top: 405px;
+                left: 35px;
+                padding-right: 20px;
+            }
+            .e-Data3 > div 
+            {
+                padding-top: 5px;
+            }
+            .e-Data4
+            {
+                height: 100px;
+                display: inline-block;
+                position:absolute;
+                z-index: 4;
+                background: transparent;
+            }
+            .TEXT 
+            {
+                font-family: Body, Quicksand, sans-serif;
+                font-weight: 400;
+                font-style: normal;
+    
+            }
+
+            input {
+            caret-color: red;
+            }
+            #container_body
+            {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.6);
+                justify-content: center;
+                align-items: center;
+                
+            }
+            #container
+            {
+
+                display: inline-block;
+                position: relative;
+                width: 100vw;
+                height: 100vh;
+                border-radius: 20px;
+                padding: 40px;
+                box-sizing: border-box;
+                background: #ecf0f3;
+                overflow-y: auto;
+                max-height: 100%;
+                box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+            }
+
+            .brand-title {
+            margin-top: 10px;
+            font-weight: 900;
+            font-size: 1.8rem;
+            display: flex;
+            justify-content: center;
+            color: #1DA1F2;
+            letter-spacing: 1px;
+            }
+
+            .inputs {
+            text-align: left;
+            margin-top: 30px;
+            }
+
+            label, input, button,.dropdown-display,select {
+            display: block;
+            width: 100%;
+            padding: 0;
+            border: none;
+            outline: none;
+            box-sizing: border-box;
+            }
+
+            label {
+            margin-bottom: 4px;
+            }
+
+            label:nth-of-type(2) {
+            margin-top: 12px;
+            }
+
+            input::placeholder {
+            color: gray;
+            }
+
+            .search-dropdown {
+            width: 420px;
+            margin: 20px auto;
+            position: relative;
+        }
+        
+            input ,.dropdown-display,select{
+            background: #ecf0f3;
+            padding: 10px;
+            padding-left: 20px;
+            height: 50px;
+            font-size: 14px;
+            border-radius: 50px;
+            box-shadow: inset 6px 6px 6px #cbced1, inset -6px -6px 6px white;
+            }
+
+            .dropdown-display{
+            font-size: 16px;
+            cursor: pointer;
+            margin: 2px 0 0 0;
+          
+        }
+         
+            button {
+            color: white;
+            margin-top: 20px;
+            background: #1DA1F2;
+            height: 40px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 900;
+            box-shadow: 6px 6px 6px #cbced1, -6px -6px 6px white;
+            transition: 0.5s;
+            }
+
+            button:hover {
+            box-shadow: none;
+            }
+
+            a {
+            position: absolute;
+            font-size: 8px;
+            bottom: 4px;
+            right: 4px;
+            text-decoration: none;
+            color: black;
+            background: yellow;
+            border-radius: 10px;
+            padding: 2px;
+            }
+
+            h1 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            }
+            @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animation for popup */
+        .overlay-container.show {
+            display: flex;
+            opacity: 1;
+        }
+        .search-dropdown
+        {
+            display: flex;
+            margin: 5px;
+            border-radius: 50px;
+        }
+        .dropdown-content
+        {
+            position: absolute;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            top: 55px;
+            z-index: 100;
+            background-color: #fff;
+            width: 420px;
+            padding: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+            display: none;
+        }
+        .dropdown_list
+        {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .dropdown_list >li
+        {
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .dropdown-content ul li {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .dropdown-content ul li:hover {
+            background-color: #f1f1f1;
+        }
+        #row_station
+        {
+            display: flex;
+            
+        }
+        </style>
+    </head>
+    <body>
+       
+<div id="container_body">
+    <div id="row">
+        <div id="container">
+            <div class="brand-title">TWITTER</div>
+            <div class="inputs">
+              <label>Select Station</label>
+               <div>
+                <div id="row_station">
+                    <div class="search-dropdown">
+                        <div class="dropdown-display" 
+                            id="dropdownDisplay">Select Form station</div>
+                        <div class="dropdown-content" 
+                            id="dropdownContent">
+                            <input type="text" 
+                                class="search-input" 
+                                id="searchInput"
+                                placeholder="Search Form Station">
+                            <ul id="dropdownList" class="dropdown_list">
+                            </ul>
+                       </div>
+                    </div>
+                    <div class="search-dropdown">
+                        <div class="dropdown-display" 
+                            id="dropdownDisplay1">Select destination station</div>
+                        <div class="dropdown-content" 
+                            id="dropdownContent1">
+                            <input type="text" 
+                                class="search-input" 
+                                id="searchInput1"
+                                placeholder="Search destination Station">
+                            <ul id="dropdownList1" class="dropdown_list">
+                            </ul>
+                       </div>
+                    </div>
+                </div>
+               </div>
+             </div>
+             <div class="inputs" style="display: flex;">
+                   <label>Train Departure Date</label>
+                    <select class="DD" id="DD1">
+                        <option value="">Select DATE</option>
+                    </select>
+                    <select class="mm" id="DD2">
+                        <option value="">Select MONTH</option>
+                    </select>
+                    <select class="YYYY" id="DD3">
+                        <option value="">Select YEAR</option>
+                    </select>
+             </div>
+            <div class="inputs" style="display: flex;">
+                <label>Train Departure Time</label>
+                <select class="HH" id="DT1">
+                    <option value="">Select HOURS</option>
+                </select>
+                <select class="MM" id="DT2">
+                    <option value="">Select MINUTES</option>
+                </select>
+             </div>
+              <div class="inputs" style="display: flex;">
+                   <label>Train Arrival Date</label>
+                    <select class="DD" id="A1">
+                        <option value="">Select DATE</option>
+                    </select>
+                    <select class="mm" id="A2">
+                        <option value="">Select MONTH</option>
+                    </select>
+                    <select class="YYYY" id="A3">
+                        <option value="">Select YEAR</option>
+                    </select>
+             </div>
+            <div class="inputs" style="display: flex;">
+                <label>Train Arrival Time</label>
+                <select class="HH" id="AT1">
+                    <option value="">Select HOURS</option>
+                </select>
+                <select class="MM" id="AT2">
+                    <option value="">Select MINUTES</option>
+                </select>
+             </div>
+             <div class="inputs">
+                <label>Train Number</label>
+                <input type="number" id="trainNo" name="TrainNumber" placeholder="Train Number">
+             </div>
+             <div class="inputs">
+                <label>Train Name</label>
+                <input type="text" id="trainName" name="TrainName" placeholder="Train Name">
+             </div>
+             <div class="inputs">
+                <label>Total Distance Form to destination (in KM)</label>
+                <input type="number" id="distance" name="distance" placeholder="Total Distance Form to destination (in KM)">
+             </div>
+             <div class="inputs">
+                <label>Select Class</label>
+                <select id="quata">
+                    <option value="">Select Class(quata)</option>
+                    <option value="SLEEPER CLASS(SL)">SLEEPER CLASS(SL)</option>
+                    <option value="SECOND CLASS(2S)">SECOND CLASS(2S)</option>
+                </select>
+             </div>
+               <div class="inputs">
+                <label>How Many Passenger</label>
+                <select id="PassengerCount" onchange="PassengerCount();">
+                    <option value="">Select Number Of Passenger</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+             </div>
+             <div class="inputs psdt" style="display: none;">
+                <label>Passenger Details 1</label>
+                <input type="text" class="pd" placeholder="Name">
+                <input type="number" class="pd" placeholder="Age">
+                <input type="text" class="pd" placeholder="Gender">
+             </div>
+                <div class="inputs psdt" style="display: none;">
+                <label>Passenger Details 2</label>
+                <input type="text" class="pd" placeholder="Name">
+                <input type="number" class="pd" placeholder="Age">
+                <input type="text" class="pd" placeholder="Gender">
+             </div>
+                <div class="inputs psdt" style="display: none;">
+                <label>Passenger Details 3</label>
+                <input type="text" class="pd" placeholder="Name">
+                <input type="number" class="pd" placeholder="Age">
+                <input type="text" class="pd" placeholder="Gender">
+             </div>
+                <div class="inputs psdt" style="display: none;">
+                <label>Passenger Details 4</label>
+                <input type="text" class="pd" placeholder="Name">
+                <input type="number" class="pd" placeholder="Age">
+                <input type="text" class="pd" placeholder="Gender">
+             </div>
+              <button type="submit" onclick="setDatainticket()">submit</button>
+              <button type="submit" onclick="closeForm()">Close</button>
+        </div>
+    </div>
+</div>
+        <div id="E-ticket_body">
+           <div>
+                <div id="E-ticket_mainBody">
+                    <div class="e-Data"  onclick="showForms()" >
+                        <div id="e1" style="display: inline-block; width: 155px;" >
+                             <div style="display: flex; justify-content: center; font-size: 15px;"><strong><span class="TEXT trn startform">BARH (BARH)</span></strong></div>
+                             <div><P class="TEXT trn" style="font-size: 14px; margin-top: 7PX;" id="sd">Start Date* 27-Nov-2024</P></div>
+                        </div>
+                        <div id="e2" style=" position: relative;left: 70px;">
+                            <div style="display: flex; justify-content: center; font-size: 15px;"><strong><span class="TEXT trn startform">BARH (BARH)</span></strong></div>
+                            <div><P class="TEXT trn" style="font-size: 14px; margin-top: 7PX;" id="sdt">Departure* 12:13 27-Nov-2024</P></div>   
+                        </div>
+                        <div id="e3" style=" position: relative;left: 150px;">
+                            <div style="display: flex; justify-content: center; font-size: 15px;"><strong><span class="TEXT trn" id="destination">PATNA JN (PNBE)</span></strong></div>
+                            <div><P class="TEXT trn" style="font-size: 14px; margin-top: 7PX;" id="Arrivaltime">Arrival* 13:45 27-Nov-2024</P></div>  
+                        </div>
+                    </div>
+                    <div class="e-Data2">
+                        <div id="e1" style="display: inline-block; width: 155px;">
+                             <div style="display: flex; justify-content: center; font-size: 17px; color:#213d77;"><strong><span class="TEXT gen" style="font-weight: bold;">8613703780</span></strong></div>
+                        </div>
+                        <div id="e2" style=" position: relative;left: 80px;">
+                            <div style="width: 250px ;display: flex; justify-content: center; font-size: 15px; font-weight: bold; color: #213d77;"><strong><span class="TEXT gen" style="font-weight: bold; letter-spacing: 0.5px;" id="trainNameandno">15648/MUMBAI LTT EXP</span></strong></div>
+                            <div><P class="TEXT gen" style="font-size: 13px; margin-top: 28pX; display: flex; justify-content: center;" id="dis">100 KM</P></div>   
+                        </div>
+                        <div id="e3" style=" position: relative;left: 150px;">
+                            <div style="display: flex; justify-content: center; font-size: 15px;"><strong><span class="TEXT gen" style="font-weight: bold; color: #213d77;" id="Q">SLEEPER CLASS (SL)</span></strong></div>
+                            <div><P class="TEXT gen" style="font-size: 13px; margin-top: 28PX;" id="booking">26-Nov-2024 19:40:21 HRS</P></div>  
+                        </div>
+                    </div>
+                    <div class="e-Data3 ">
+                        <div class="p" style="display: none;">
+                             <div style="width: 20px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span >1.</span></strong></div>
+                             <div style="width: 155px;display: flex; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 40px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 100px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 210px;display: flex;  font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 210px;display: flex;  font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                        </div>
+                        <div class="p" style="display: none;">
+                            <div style="width: 20px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span >2.</span></strong></div>
+                            <div style="width: 155px;display: flex; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                            <div style="width: 40px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                            <div style="width: 100px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                            <div style="width: 210px;display: flex;  font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                            <div style="width: 210px;display: flex;  font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                       </div>
+                        <div class="p" style="display: none;">
+                             <div style="width: 20px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span>3.</span></strong></div>
+                             <div style="width: 155px;display: flex; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 40px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 100px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 210px;display: flex;  font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 210px;display: flex;  font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                        </div>
+                        <div class="p" style="display: none;">
+                             <div style="width: 20px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span>4.</span></strong></div>
+                             <div style="width: 155px;display: flex; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 40px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 100px;display: flex; justify-content: center; font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 210px;display: flex;  font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                             <div style="width: 210px;display: flex;  font-size: 13px; color:black;"><strong><span class="TEXT pdata"></span></strong></div>
+                        </div>
+                    </div>
+                    <div class="e-Data4" id="farebody">
+                        <div style="width: 50px;display: flex;  font-size: 13px; color:black;"><strong><span class="TEXT fare"></span></strong></div>
+                        <div style="width: 50px;display: flex;  font-size: 13px; color:black; padding-top: 3px;"><strong><span class="TEXT fare"></span></strong></div>
+                         <div style="width: 50px;display: flex;  font-size: 13px; color:black; padding-top: 3px;"><strong><span class="TEXT fare"></span></strong></div>
+                        <div style="width: 50px;display: flex; font-size: 13px; color:black; padding-top: 4px;"><strong><span class="TEXT fare"></span></strong></div>
+                    </div>
+                    <img id="E-ticket" class="e-Image mainImageBody" src="Assets/TicketTemp/temp_3.jpg"/>
+                </div>
+                <div class="e-div">
+                     <img id="E-ticket" class="e-Image" src="Assets/TicketTemp/second.jpg"/>
+                </div>
+                <div class="e-div">
+                     <img id="E-ticket" class="e-Image" src="Assets/TicketTemp/last.jpg"/>
+                </div>
+                <button style="display: flex; justify-content: center;align-items:center ; margin-bottom:  100px; width: 150px; height: 50px; border-radius: 20px; background-color: #213d77; color: aliceblue; left: 300px; position: relative; margin-top: 100px;"onclick="window.print();" class="noPrint" >Print Me</button>
+                <button style=" cursor: pointer;display: flex; justify-content: center;align-items:center ; margin-bottom:  100px; width: 150px; height: 50px; border-radius: 20px; background-color: #213d77; color: aliceblue; left: 300px; position: relative; margin-top: 100px;"onclick="showForm();" class="noPrint" >add train</button>
+           </div>
+        </div>
+           <script>
+                var innerText ='<option value="">Select HOURS</option>';
+                for(var i=1 ;i<=24;i++)
+                {
+                    if(i<10)
+                       innerText = innerText+ '<option value="0'+i+'">0'+i+'</option>';
+                    else
+                      innerText = innerText+ '<option value="'+i+'">'+i+'</option>';
+                }
+                for(var i =0; i<document.getElementsByClassName("HH").length;i++){
+                  document.getElementsByClassName("HH")[i].innerHTML=innerText;
+                }
+                innerText ='<option value="">Select MINUTES</option>';
+                for(var i=0 ;i<=59;i++)
+                {
+                    if(i==0)
+                      innerText = innerText+ '<option value="'+i+'0">'+i+'0</option>';
+                    else if(i>0 && i<10)
+                         innerText = innerText+ '<option value="0'+i+'">0'+i+'</option>';
+                    else
+                         innerText = innerText+ '<option value="'+i+'">'+i+'</option>';
+                }
+                for(var i =0; i<document.getElementsByClassName("MM").length;i++){
+                  document.getElementsByClassName("MM")[i].innerHTML = innerText;
+                }
+               
+                
+                innerText ='<option value="">Select DATE</option>';
+                for(var i=1 ;i<=31;i++)
+                {
+                    if(i<10)
+                       innerText = innerText+ '<option value="0'+i+'">0'+i+'</option>';
+                    else
+                      innerText = innerText+ '<option value="'+i+'">'+i+'</option>';
+                }
+                 for(var i =0; i<document.getElementsByClassName("DD").length;i++){
+                  document.getElementsByClassName("DD")[i].innerHTML = innerText;
+                }
+                
+
+                innerText ='<option value="">Select MONTH</option>';
+                for(var i=1 ;i<=12;i++)
+                {
+                    if(i<10)
+                       innerText = innerText+ '<option value="0'+i+'">0'+i+'</option>';
+                    else
+                      innerText = innerText+ '<option value="'+i+'">'+i+'</option>';
+                }
+                 for(var i =0; i<document.getElementsByClassName("mm").length;i++){
+                   document.getElementsByClassName("mm")[i].innerHTML = innerText;
+                }
+                innerText ='<option value="">Select YEAR</option>';
+                for(var i=2024 ;i<=2050;i++)
+                {
+                      innerText = innerText+ '<option value="'+i+'">'+i+'</option>';
+                }
+                 for(var i =0; i<document.getElementsByClassName("YYYY").length;i++){
+                  document.getElementsByClassName("YYYY")[i].innerHTML = innerText;
+                }
+                
+
+           </script>
+        <script>
+            function printBody()
+            {
+               document.getElementById("printButton").display = "none";
+               window.print();
+            }
+        </script>
+
+        <script>
+           const dropdownbody = document.getElementsByClassName("dropdown_list");
+           var stationlist= "";
+           function station_list()
+            {
+               
+                    const xhr = new XMLHttpRequest(); 
+                    xhr.open("GET", "https://dangerousjaguarr.github.io/stationNameList_and_code/stationlist.json", true); 
+                    xhr.getResponseHeader("Content-type", "application/json"); 
+                
+                    xhr.onload = function() { 
+                       let stationlisttext = JSON.parse(this.responseText);
+                       let i =0;
+                        while(i<stationlisttext.length)
+                        {
+                            stationlist = stationlist+" <li>"+stationlisttext[i].station_name+" ("+stationlisttext[i].station_code+")</li>";
+                            i++;
+                        }
+                    } 
+                    xhr.send(); 
+            }
+            station_list();
+      
+
+        </script>
+         <script>
+            $(document).ready(function () {
+                $('#dropdownDisplay').on('click', function () {
+                    $('#dropdownContent').toggle();
+                    dropdownbody[0].innerHTML = stationlist;
+                });
+    
+                $('#searchInput').on('input', function () {
+                    let value = $(this).val().toLowerCase();
+                    $('#dropdownList li').filter(function () {
+                        $(this).toggle($(this).text()
+                               .toLowerCase().indexOf(value) > -1);
+                    });
+                });
+                $('#dropdownList').on('click', 'li', function () {
+                    $('#dropdownDisplay').text($(this).text());
+                    $('#dropdownContent').hide();
+                });
+    
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('.search-dropdown').length) {
+                        $('#dropdownContent').hide();
+                        $('#dropdownContent1').hide();
+                    }
+                });
+            });
+        </script>  
+         <script>
+            $(document).ready(function () {
+                $('#dropdownDisplay1').on('click', function () {
+                    $('#dropdownContent1').toggle();
+                    dropdownbody[1].innerHTML = stationlist;
+                });
+    
+                $('#searchInput1').on('input', function () {
+                    let value = $(this).val().toLowerCase();
+                    $('#dropdownList1 li').filter(function () {
+                        $(this).toggle($(this).text()
+                               .toLowerCase().indexOf(value) > -1);
+                    });
+                });
+    
+                $('#dropdownList1').on('click', 'li', function () {
+                    $('#dropdownDisplay1').text($(this).text());
+                    $('#dropdownContent1').hide();
+                });
+    
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('.search-dropdown').length) {
+                        $('#dropdownContent1').hide();
+                        $('#dropdownContent').hide();
+                    }
+                });
+                
+            });
+        </script>  
+        <script>
+              function closeForm()
+        {
+            document.getElementById("container_body").style.display="none";
+            document.getElementsByClassName("noPrint")[0].style.display="flex";
+            document.getElementsByClassName("noPrint")[1].style.display="flex";
+        }
+            function showForm() {
+                document.getElementById("container_body").style.display="flex";
+                document.getElementsByClassName("noPrint")[0].style.display="none";
+                document.getElementsByClassName("noPrint")[1].style.display="none";
+            }
+        </script>
+         <script>
+            function getArrivalDate()
+            {
+                return document.getElementById("AT1").value+":"+document.getElementById("AT2").value +"\t"+document.getElementById("A1").value+"-"+getmonth(parseInt(document.getElementById("A2").value)-1)+"-"+document.getElementById("A3").value;
+            }
+            function getDepartureDate(data)
+            {
+                if(data==0)
+                  return document.getElementById("DT1").value +":"+document.getElementById("DT2").value +"\t"+document.getElementById("DD1").value+"-"+getmonth(parseInt(document.getElementById("DD2").value)-1)+"-"+document.getElementById("DD3").value;
+                else
+                  return document.getElementById("DD1").value +"-"+getmonth(parseInt(document.getElementById("DD2").value)-1)+"-"+document.getElementById("DD3").value;
+    
+            }
+            function setDatainticket()
+            {
+               const sf = document.getElementsByClassName("startform");
+               const sd = document.getElementById("sd");
+               const sdt = document.getElementById("sdt");
+               const destination = document.getElementById("destination");
+               const Arrivaltime = document.getElementById("Arrivaltime");
+               const trainNameandno = document.getElementById("trainNameandno");
+              
+               
+              sf[0].innerText = document.getElementById("dropdownDisplay").innerText;
+              sf[1].innerText = document.getElementById("dropdownDisplay").innerText;
+              destination.innerText = document.getElementById("dropdownDisplay1").innerText;
+              sd.innerText = "Start Date* "+getDepartureDate(1);
+              sdt.innerText ="Departure* "+getDepartureDate(0);
+              Arrivaltime.innerText = "Arrival* "+getArrivalDate();
+              trainNameandno.innerText = document.getElementById("trainNo").value+"/"+(document.getElementById("trainName").value).toUpperCase();
+              document.getElementById("dis").innerText = document.getElementById("distance").value+" KM";
+              document.getElementById("Q").innerText = document.getElementById("quata").value;
+              document.getElementById("booking").innerText= getbookingdate();
+              addpen();
+              priceCalculator();
+              closeForm();
+            }
+            
+            function priceCalculator()
+            {
+                const PC = parseInt(document.getElementById("PassengerCount").value);
+                const dist = parseInt(document.getElementById("distance").value);
+                const index = document.getElementsByClassName("fare");
+                const baseFare = Math.floor(dist/2)*PC;
+                const convance = 17.70;
+                const insurance = 0.45*PC;
+                const total = baseFare+convance+insurance;
+                index[0].innerText = baseFare;
+                index[1].innerText = convance;
+                index[2].innerText = insurance.toFixed(2);
+                index[3].innerText = total.toFixed(2);
+            }
+            function addpen()
+            {
+                const PC= document.getElementById("PassengerCount");
+                if(PC.value!="")
+                {
+                    addpessager(document.getElementsByClassName("pdata"),PC.value);
+                }
+                else
+                {
+                  alert("error");
+                }
+            }
+            function addpessager(data,HM)
+            {
+                const detais = document.getElementsByClassName("pd");
+                var d=0,t=0;
+                var seat = 25;
+                for(let i =0; i<parseInt(HM);i++)
+                {
+                    data[t].innerText = detais[d].value;
+                    data[t+1].innerText = detais[d+1].value;
+                    data[t+2].innerText = detais[d+2].value.toUpperCase();
+                     if(document.getElementById("quata").value!="")
+                    {
+                        if(document.getElementById("quata").value=="SLEEPER CLASS(SL)")
+                        {
+                            data[t+3].innerText = "CNF/S2/"+seat+"/SIDE UPPER";
+                            data[t+4].innerText = "CNF/S2/"+seat+"/SIDE UPPER";
+                        }
+                        else
+                        {
+                            data[t+3].innerText = "CNF/D2/"+seat;
+                            data[t+4].innerText = "CNF/D2/"+seat;
+                        }
+                    }
+                    t=t+5;
+                    d=d+3;
+                    seat =seat+1;
+                }
+            }
+            function getbookingdate()
+            {
+                const d = new Date();
+                return (d.getDate()-2) +"-"+getmonth(d.getMonth())+"-"+d.getFullYear()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+" HRS";
+
+            }
+            function getmonth(data)
+            {
+                if(data==0)
+                {
+                    return "Jan";
+                }
+                else if(data==1)
+                {
+                    return "Feb";
+                }
+                else if(data==2)
+                {
+                    return "Mar";
+                }
+                else if(data==3)
+                {
+                    return "Apr";
+                }
+                else if(data==4)
+                {
+                    return "May";
+                }
+                else if(data==5)
+                {
+                    return "Jun";
+                }
+                else if(data==6)
+                {
+                    return "Jul";
+                }
+                else if(data==7)
+                {
+                    return "Aug";
+                }
+                else if(data==8)
+                {
+                    return "Seb";
+                }
+                else if(data==9)
+                {
+                    return "Oct";
+                }
+                else if(data==10)
+                {
+                    return "Nov";
+                }
+                else if(data==11)
+                {
+                    return "Dec";
+                }
+            }
+            function PassengerCount()
+            {
+               const PC= document.getElementById("PassengerCount");
+               const pdis = document.getElementsByClassName("p");
+               const padd = document.getElementsByClassName("psdt");
+               const img = document.getElementsByClassName("mainImageBody");
+               if(PC.value!=""){
+               if(PC.value=="1")
+               {
+                  pdis[0].style.display ="flex";
+                  padd[0].style.display="flex";
+
+                  pdis[1].style.display ="none";
+                  padd[1].style.display="none";
+
+                  pdis[2].style.display ="none";
+                  padd[2].style.display="none";
+
+                  pdis[3].style.display ="none";
+                  padd[3].style.display="none";
+                  img[0].src = "Assets/TicketTemp/temp_1.jpg"
+
+                  document.getElementById("farebody").style="top:545px;left:363px";
+               }
+               else if(PC.value=="2")
+               {
+                   pdis[0].style.display ="flex";
+                  padd[0].style.display="flex";
+
+                  pdis[1].style.display ="flex";
+                  padd[1].style.display="flex";
+
+                   pdis[2].style.display ="none";
+                  padd[2].style.display="none";
+
+                  pdis[3].style.display ="none";
+                  padd[3].style.display="none";
+                  img[0].src = "Assets/TicketTemp/temp_2.jpg"
+                   document.getElementById("farebody").style="top:560px;left:363px";
+               }
+               else if(PC.value=="3")
+               {
+                  pdis[0].style.display ="flex";
+                  padd[0].style.display="flex";
+
+                  pdis[1].style.display ="flex";
+                  padd[1].style.display="flex";
+
+                  pdis[2].style.display ="flex";
+                  padd[2].style.display="flex";
+
+                  pdis[3].style.display ="none";
+                  padd[3].style.display="none";
+                  img[0].src = "Assets/TicketTemp/temp_3.jpg"
+                   document.getElementById("farebody").style="top:590px;left:363px";
+               }
+               else if(PC.value=="4")
+               {
+                  pdis[0].style.display ="flex";
+                  padd[0].style.display="flex";
+
+                  pdis[1].style.display ="flex";
+                  padd[1].style.display="flex";
+
+                  pdis[2].style.display ="flex";
+                  padd[2].style.display="flex";
+
+                  pdis[3].style.display ="flex";
+                  padd[3].style.display="flex";
+                  img[0].src = "Assets/TicketTemp/temp_4.jpg"
+                   document.getElementById("farebody").style="top:610px;left:363px";
+               }
+            }
+            else 
+               {
+                  pdis[0].style.display ="none";
+                  padd[0].style.display="none";
+
+                  pdis[1].style.display ="none";
+                  padd[1].style.display="none";
+
+                  pdis[2].style.display ="none";
+                  padd[2].style.display="none";
+
+                  pdis[3].style.display ="none";
+                  padd[3].style.display="none";
+               }
+
+            }
+         </script>
+    </body>
+</html>
